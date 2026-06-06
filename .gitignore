@@ -1,0 +1,33 @@
+# Build artifacts
+build/
+bin/
+out/
+
+# Gradle files
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# IDE specific files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Minecraft Server files (created by the 'run' task)
+run/
+*.log
+*.lock
+logs/
+cache/
+paper-*.jar
+world/
+banned-*.json
+ops.json
+whitelist.json
+usercache.json
+eula.txt
+
+# OS generated files
+.DS_Store
+Thumbs.db

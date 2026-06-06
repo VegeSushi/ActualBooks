@@ -1,0 +1,6 @@
+name: ActualBooks
+version: '${version}'
+
+main: online.sushiware.actualBooks.ActualBooks
+api-version: '26.1.2'
+load: POSTWORLD
