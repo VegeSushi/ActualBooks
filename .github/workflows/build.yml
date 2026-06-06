@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 permissions:
   contents: write
@@ -29,23 +28,32 @@ jobs:
       - name: Build plugin
         run: ./gradlew build
 
-      - name: Debug build output
+      - name: Show build output
         run: ls -lah build/libs
 
-      - name: Verify JAR exists
+      - name: Find actual JAR
         run: |
-          if [ ! -f build/libs/ActualBooks-ver.jar ]; then
-            echo "ERROR: JAR not found"
+          set -e
+
+          JAR=$(find build/libs -type f -name "*.jar" | head -n 1)
+
+          echo "Found: $JAR"
+
+          if [ -z "$JAR" ]; then
+            echo "ERROR: No jar produced by Gradle"
             exit 1
           fi
 
-      - name: Prepare release file
-        run: |
           mkdir -p dist
-          cp build/libs/ActualBooks-ver.jar dist/ActualBooks-ver.jar
+          cp "$JAR" dist/ActualBooks-ver.jar
 
-      - name: Generate version
-        run: echo "release-$(date +%Y%m%d-%H%M%S)" > version.txt
+          ls -lah dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ActualBooks
+          path: dist/ActualBooks-ver.jar
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
