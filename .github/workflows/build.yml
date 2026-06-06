@@ -2,8 +2,10 @@ name: Build and Release Plugin
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*' ]
+    branches:
+      - main
+    tags:
+      - 'v*'
   pull_request:
 
 permissions:
@@ -17,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -29,38 +31,30 @@ jobs:
       - name: Build plugin
         run: ./gradlew build
 
-      - name: Debug build output (important)
+      - name: List build output
+        run: ls -lah build/libs || true
+
+      - name: Find and prepare JAR
         run: |
-          echo "=== build/libs ==="
-          ls -lah build/libs || true
+          FILE=$(find build/libs -type f -name "*ActualBooks*.jar" | head -n 1)
 
-      - name: Find JAR and rename
-        run: |
-          set -e
-
-          echo "Searching for JAR..."
-          JAR=$(find build/libs -type f -name "*.jar" | head -n 1)
-
-          echo "Found: $JAR"
-
-          if [ -z "$JAR" ]; then
-            echo "No JAR found in build/libs"
+          if [ -z "$FILE" ]; then
+            echo "No JAR found"
             exit 1
           fi
 
           mkdir -p dist
-          cp "$JAR" dist/ActualBooks-ver.jar
+          cp "$FILE" dist/ActualBooks-ver.jar
 
-          echo "Final output:"
           ls -lah dist
 
-      - name: Upload artifact (CI builds)
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ActualBooks
           path: dist/ActualBooks-ver.jar
 
-      - name: Create GitHub Release (tags only)
+      - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
