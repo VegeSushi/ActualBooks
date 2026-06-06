@@ -2,10 +2,8 @@ name: Build and Release Plugin
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - 'v*'
+    branches: [ main ]
+    tags: [ 'v*' ]
   pull_request:
 
 permissions:
@@ -16,8 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Java 25
         uses: actions/setup-java@v4
@@ -31,17 +28,22 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Upload Build Artifact
+      - name: Rename JAR
+        run: |
+          mkdir -p dist
+          cp build/libs/*.jar dist/ActualBooks-ver.jar
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-jar
-          path: build/libs/*.jar
+          name: ActualBooks
+          path: dist/ActualBooks-ver.jar
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/libs/*.jar
+          files: dist/ActualBooks-ver.jar
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
