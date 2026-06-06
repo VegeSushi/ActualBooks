@@ -5,7 +5,6 @@ out/
 
 # Gradle files
 .gradle/
-gradle/wrapper/gradle-wrapper.jar
 
 # IDE specific files
 .idea/
